@@ -1,0 +1,184 @@
+/// Churn probability per active customer, 3-month horizon.
+table 'Churn Score'
+	lineageTag: e6049c78-2117-5a19-8d03-9840b7650373
+
+	measure 'Customers Scored' = COUNTROWS('Churn Score')
+		formatString: #,0
+		displayFolder: Churn
+		lineageTag: b43b1f08-0d38-5d93-ad8c-b78fd1e864b4
+
+	measure 'High Risk Customers' = CALCULATE([Customers Scored], 'Churn Score'[Risk Band] = "High")
+		formatString: #,0
+		displayFolder: Churn
+		lineageTag: b0685b95-b43c-5dfa-8645-1885063ede34
+
+	measure 'High Risk Share' = DIVIDE([High Risk Customers], [Customers Scored])
+		formatString: 0.0%
+		displayFolder: Churn
+		lineageTag: 94c41e48-9d3c-557b-ba3e-9ade5962bfc9
+
+	measure 'Avg Churn Probability' = AVERAGE('Churn Score'[Churn Probability])
+		formatString: 0.00%
+		displayFolder: Churn
+		lineageTag: d15a1164-e702-559f-82b3-f7e8c065550c
+
+	/// Sum of probabilities = expected number of customers leaving in the next 3 months.
+	measure 'Expected Churners (3M)' = SUM('Churn Score'[Churn Probability])
+		formatString: #,0
+		displayFolder: Churn
+		lineageTag: b36418c8-d6d8-5ec7-b2c7-d7bf8d021855
+
+	/// 6-month average balance x churn probability.
+	measure 'Balance at Risk (SAR)' = SUM('Churn Score'[Balance at Risk SAR])
+		formatString: #,0
+		displayFolder: Churn
+		lineageTag: e3e9ad09-c2da-5bb6-b844-cd875f5a3720
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3b353e85-2480-5e3e-837b-5e8b3bff0a08
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Score Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 97a3b616-294b-5d47-8a5c-bb28f01d4130
+		summarizeBy: none
+		sourceColumn: Score Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Churn Probability'
+		dataType: double
+		formatString: 0.00%
+		lineageTag: dffaf2bc-f8d0-552d-b981-538263734ed1
+		summarizeBy: none
+		sourceColumn: Churn Probability
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Risk Decile'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0a44bc79-986d-5b45-b569-0152d8ec7db7
+		summarizeBy: none
+		sourceColumn: Risk Decile
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Risk Band'
+		dataType: string
+		lineageTag: 49450b18-86f8-5cbe-8961-e7c1be648969
+		summarizeBy: none
+		sourceColumn: Risk Band
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Balance at Risk SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 8f3e7820-d29b-5617-b860-051711515585
+		summarizeBy: sum
+		sourceColumn: Balance at Risk SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Primary Signal'
+		dataType: string
+		lineageTag: 12d1b0aa-349e-5157-ac19-3809a2a35d60
+		summarizeBy: none
+		sourceColumn: Primary Signal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Txn Trend'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 8580a927-9594-5241-b75b-5f9ed586e765
+		summarizeBy: none
+		sourceColumn: Txn Trend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Logins Trend'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 5be771ad-14db-542e-94a0-9a9df29d6cd6
+		summarizeBy: none
+		sourceColumn: Logins Trend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Balance Trend'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 3cf63080-9291-5f5a-9e80-ed4a3e4442a6
+		summarizeBy: none
+		sourceColumn: Balance Trend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Complaints 6M'
+		dataType: int64
+		formatString: 0
+		lineageTag: 591dccbd-f3a1-58a7-a420-034c7d2e2b3b
+		summarizeBy: none
+		sourceColumn: Complaints 6M
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Salary Credit Ratio 6M'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 8e6f1890-879c-5ba0-8fa1-9de7ce828dee
+		summarizeBy: none
+		sourceColumn: Salary Credit Ratio 6M
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Balance Avg 6M SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 605bf467-d2b5-5043-b9b0-dedb084c8bb4
+		summarizeBy: none
+		sourceColumn: Balance Avg 6M SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: f2a4b24e-bf0e-5bf6-892a-ca5f624dd4ef
+		summarizeBy: none
+		sourceColumn: Model Version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Churn Score' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "fact_churn_score"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "fact_churn_score", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "fact_churn_score.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"customer_id", "score_date", "churn_probability", "risk_decile", "risk_band", "balance_at_risk_sar", "primary_signal", "txn_trend", "logins_trend", "balance_trend", "complaints_6m", "salary_credit_ratio_6m", "balance_avg_6m", "model_version"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"customer_id", Int64.Type}, {"score_date", type date}, {"churn_probability", type number}, {"risk_decile", Int64.Type}, {"risk_band", type text}, {"balance_at_risk_sar", type number}, {"primary_signal", type text}, {"txn_trend", type number}, {"logins_trend", type number}, {"balance_trend", type number}, {"complaints_6m", Int64.Type}, {"salary_credit_ratio_6m", type number}, {"balance_avg_6m", type number}, {"model_version", type text}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"customer_id", "Customer ID"}, {"score_date", "Score Date"}, {"churn_probability", "Churn Probability"}, {"risk_decile", "Risk Decile"}, {"risk_band", "Risk Band"}, {"balance_at_risk_sar", "Balance at Risk SAR"}, {"primary_signal", "Primary Signal"}, {"txn_trend", "Txn Trend"}, {"logins_trend", "Logins Trend"}, {"balance_trend", "Balance Trend"}, {"complaints_6m", "Complaints 6M"}, {"salary_credit_ratio_6m", "Salary Credit Ratio 6M"}, {"balance_avg_6m", "Balance Avg 6M SAR"}, {"model_version", "Model Version"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

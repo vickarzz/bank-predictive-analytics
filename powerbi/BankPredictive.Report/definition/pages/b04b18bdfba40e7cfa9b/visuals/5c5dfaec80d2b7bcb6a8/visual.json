@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "5c5dfaec80d2b7bcb6a8",
+  "position": {
+    "x": 437,
+    "y": 200,
+    "z": 11000,
+    "height": 230,
+    "width": 405,
+    "tabOrder": 10000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Risk Decile"
+                }
+              },
+              "queryRef": "Churn Score.Risk Decile",
+              "nativeQueryRef": "Risk Decile",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Avg Churn Probability"
+                }
+              },
+              "queryRef": "Churn Score.Avg Churn Probability",
+              "nativeQueryRef": "Avg Churn Probability"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Average churn probability by risk decile'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

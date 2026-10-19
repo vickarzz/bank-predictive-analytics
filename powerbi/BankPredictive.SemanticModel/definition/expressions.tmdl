@@ -1,0 +1,47 @@
+/// Where to read the gold tables from
+expression SourceType = "CSV" meta [IsParameterQuery = true, List = {"CSV", "PostgreSQL", "Databricks"}, DefaultValue = "CSV", Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 33f1c7b3-174b-582e-8004-d67bb0f07246
+
+	annotation PBI_ResultType = Text
+
+/// Folder with gold CSV files (end with a backslash)
+expression CsvFolder = "C:\bank-predictive-analytics\data\gold\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: d452647d-6853-5bcb-93b6-a2933dffcd84
+
+	annotation PBI_ResultType = Text
+
+/// PostgreSQL host:port (Docker stack)
+expression PgServer = "localhost:5432" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: fdaac1eb-be1d-5fba-b141-66d80564ab36
+
+	annotation PBI_ResultType = Text
+
+/// PostgreSQL database (schema gold)
+expression PgDatabase = "bpa" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 3dec8fe7-24d7-5756-8e08-a141df37c1a1
+
+	annotation PBI_ResultType = Text
+
+/// Databricks SQL warehouse server hostname
+expression DbxServerHostname = "dbc-00000000-0000.cloud.databricks.com" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: d0b0ae9b-145e-5104-8e03-0fc1e658e7cd
+
+	annotation PBI_ResultType = Text
+
+/// Databricks SQL warehouse HTTP path
+expression DbxHttpPath = "/sql/1.0/warehouses/0000000000000000" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 912412d1-b0f8-5139-a5a4-f0b1dabacf8b
+
+	annotation PBI_ResultType = Text
+
+/// Unity Catalog catalog
+expression DbxCatalog = "workspace" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 169e4ba8-4c24-5e48-9151-56181a7d882b
+
+	annotation PBI_ResultType = Text
+
+/// Unity Catalog schema
+expression DbxSchema = "bpa" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 6c5a1b79-df0b-5006-afc9-555288fd7dd6
+
+	annotation PBI_ResultType = Text

@@ -1,0 +1,53 @@
+table Corridor
+	lineageTag: bc4accb9-0a1f-54e0-8838-a4c5d51afc8f
+
+	column Corridor
+		dataType: string
+		isKey
+		lineageTag: bc2d9b46-c2cf-567f-be04-cdf167506644
+		summarizeBy: none
+		sourceColumn: Corridor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency
+		dataType: string
+		lineageTag: 9303e00e-4660-58fa-add9-7742be63269d
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Corridor Region'
+		dataType: string
+		lineageTag: 510c2c10-4c9b-5b41-b1b6-50c486849249
+		summarizeBy: none
+		sourceColumn: Corridor Region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Corridor = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "dim_corridor"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "dim_corridor", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "dim_corridor.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"corridor", "currency", "region"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"corridor", type text}, {"currency", type text}, {"region", type text}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"corridor", "Corridor"}, {"currency", "Currency"}, {"region", "Corridor Region"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

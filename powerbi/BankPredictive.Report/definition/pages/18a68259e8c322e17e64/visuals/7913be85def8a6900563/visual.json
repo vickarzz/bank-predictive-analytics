@@ -1,0 +1,140 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "7913be85def8a6900563",
+  "position": {
+    "x": 16,
+    "y": 200,
+    "z": 7000,
+    "height": 280,
+    "width": 1248,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date"
+                    }
+                  },
+                  "Property": "Date"
+                }
+              },
+              "queryRef": "Date.Date",
+              "nativeQueryRef": "Date",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Actual"
+                    }
+                  },
+                  "Property": "Remittance Actual (SAR)"
+                }
+              },
+              "queryRef": "Remittance Actual.Remittance Actual (SAR)",
+              "nativeQueryRef": "Actual",
+              "displayName": "Actual"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Actual"
+                    }
+                  },
+                  "Property": "Backtest Forecast (SAR)"
+                }
+              },
+              "queryRef": "Remittance Actual.Backtest Forecast (SAR)",
+              "nativeQueryRef": "Backtest",
+              "displayName": "Backtest"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Forecast"
+                    }
+                  },
+                  "Property": "Remittance Forecast (SAR)"
+                }
+              },
+              "queryRef": "Remittance Forecast.Remittance Forecast (SAR)",
+              "nativeQueryRef": "Forecast",
+              "displayName": "Forecast"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Forecast"
+                    }
+                  },
+                  "Property": "Forecast P10 (SAR)"
+                }
+              },
+              "queryRef": "Remittance Forecast.Forecast P10 (SAR)",
+              "nativeQueryRef": "P10",
+              "displayName": "P10"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Forecast"
+                    }
+                  },
+                  "Property": "Forecast P90 (SAR)"
+                }
+              },
+              "queryRef": "Remittance Forecast.Forecast P90 (SAR)",
+              "nativeQueryRef": "P90",
+              "displayName": "P90"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Actual, backtest and forecast with P10-P90 band (SAR)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

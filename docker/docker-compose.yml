@@ -1,0 +1,82 @@
+# Local production-like stack:
+#   PostgreSQL (gold layer + Airflow & MLflow metadata)  -> localhost:5432
+#   MLflow tracking server + model registry              -> http://localhost:5000
+#   Airflow 3 (standalone: api-server, scheduler, dag-processor, triggerer; LocalExecutor)
+#                                                        -> http://localhost:8080  (no login, local demo only)
+#
+# Run from the repo root:  docker compose -f docker/docker-compose.yml up -d --build
+
+x-airflow-env: &airflow-env
+  AIRFLOW__CORE__EXECUTOR: LocalExecutor
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://bpa:bpa@postgres:5432/airflow
+  AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+  # Local demo only: every visitor is admin. Remove for any shared environment.
+  AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+  BPA_DATA_DIR: /opt/bpa/data
+  BPA_POSTGRES_URL: postgresql+psycopg2://bpa:bpa@postgres:5432/bpa
+  BPA_N_CUSTOMERS: ${BPA_N_CUSTOMERS:-50000}
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+  PYTHONPATH: /opt/bpa/src
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: bpa-postgres
+    environment:
+      POSTGRES_USER: bpa
+      POSTGRES_PASSWORD: bpa
+      POSTGRES_DB: bpa
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bpa -d bpa"]
+      interval: 5s
+      retries: 20
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: bpa-mlflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlartifacts:/mlartifacts
+    command: >
+      mlflow server
+      --host 0.0.0.0 --port 5000
+      --backend-store-uri postgresql+psycopg2://bpa:bpa@postgres:5432/mlflow
+      --artifacts-destination /mlartifacts
+      --serve-artifacts
+      --allowed-hosts "mlflow,mlflow:5000,localhost,localhost:5000,127.0.0.1:5000"
+
+  airflow:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.airflow
+    container_name: bpa-airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    user: "${AIRFLOW_UID:-50000}:0"   # on Linux run: echo "AIRFLOW_UID=$(id -u)" > docker/.env
+    environment: *airflow-env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../dags:/opt/airflow/dags
+      - ../src:/opt/bpa/src
+      - ../data:/opt/bpa/data
+    command: standalone
+
+volumes:
+  pgdata:
+  mlartifacts:

@@ -1,0 +1,99 @@
+/// Daily outbound remittance actuals per corridor, with 90-day backtest forecast.
+table 'Remittance Actual'
+	lineageTag: 60839879-56f7-5dbb-8d7c-17da6b8a061e
+
+	measure 'Remittance Actual (SAR)' = SUM('Remittance Actual'[Amount SAR])
+		formatString: #,0
+		displayFolder: Remittance
+		lineageTag: 74e55c04-ab51-5431-a7d2-358e5365a5af
+
+	measure 'Backtest Forecast (SAR)' = SUM('Remittance Actual'[Backtest Forecast SAR])
+		formatString: #,0
+		displayFolder: Remittance
+		lineageTag: 227802da-01d3-541c-a31c-525a345f15fe
+
+	/// Mean absolute percentage error on the 90-day hold-out.
+	measure 'Backtest MAPE' = AVERAGEX(FILTER('Remittance Actual', NOT ISBLANK('Remittance Actual'[Backtest Forecast SAR])), DIVIDE(ABS('Remittance Actual'[Backtest Forecast SAR] - 'Remittance Actual'[Amount SAR]), 'Remittance Actual'[Amount SAR]))
+		formatString: 0.00%
+		displayFolder: Remittance
+		lineageTag: 6e79a321-cd74-55f4-aed4-0b97060b58e1
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isHidden
+		lineageTag: 50398af9-559d-55be-b92c-36f8a6659bbd
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Corridor
+		dataType: string
+		isHidden
+		lineageTag: 03eadede-7d91-5837-81f1-799e82890b7d
+		summarizeBy: none
+		sourceColumn: Corridor
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Amount SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: fcf47880-f217-5bec-a294-ca3a542e2b13
+		summarizeBy: sum
+		sourceColumn: Amount SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Txn Count'
+		dataType: int64
+		formatString: #,0
+		lineageTag: fb284586-ca0f-5a0e-9b1f-edeedfb17712
+		summarizeBy: sum
+		sourceColumn: Txn Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Backtest Forecast SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: babf5880-0030-53b7-9cf4-50977676294a
+		summarizeBy: sum
+		sourceColumn: Backtest Forecast SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Backtest Period'
+		dataType: boolean
+		lineageTag: 4e577cd4-f2cd-5457-85d7-70cb745fac55
+		summarizeBy: none
+		sourceColumn: Is Backtest Period
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Remittance Actual' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "fact_remittance_daily"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "fact_remittance_daily", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "fact_remittance_daily.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"date", "corridor", "amount_sar", "txn_count", "backtest_forecast_sar", "is_backtest_period"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"date", type date}, {"corridor", type text}, {"amount_sar", type number}, {"txn_count", Int64.Type}, {"backtest_forecast_sar", type number}, {"is_backtest_period", type logical}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"date", "Date"}, {"corridor", "Corridor"}, {"amount_sar", "Amount SAR"}, {"txn_count", "Txn Count"}, {"backtest_forecast_sar", "Backtest Forecast SAR"}, {"is_backtest_period", "Is Backtest Period"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

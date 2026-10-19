@@ -1,0 +1,23 @@
+# data & model outputs (regenerate with: python -m bpa.pipeline all)
+data/*
+!data/.gitkeep
+mlruns/
+mlflow.db
+*.joblib
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+
+# Power BI local files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Databricks bundle
+.databricks/
+
+# docker
+docker/.env

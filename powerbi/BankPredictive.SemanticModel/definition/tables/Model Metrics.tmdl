@@ -1,0 +1,104 @@
+/// Out-of-time / backtest metrics written by every pipeline run.
+table 'Model Metrics'
+	lineageTag: 74bff09a-444a-5145-b480-1d8359dee3e5
+
+	measure 'Metric Value' = SUM('Model Metrics'[Value])
+		formatString: 0.000
+		displayFolder: Model health
+		lineageTag: 1c669d69-a27a-56b7-a9ae-f7aefd41d58f
+
+	measure 'Churn AUC' = CALCULATE([Metric Value], 'Model Metrics'[Model Name] = "churn", 'Model Metrics'[Metric] = "auc")
+		formatString: 0.000
+		displayFolder: Model health
+		lineageTag: d7c3bad2-0d04-541c-a6c2-a9c55c827749
+
+	measure 'Credit AUC' = CALCULATE([Metric Value], 'Model Metrics'[Model Name] = "credit_risk", 'Model Metrics'[Metric] = "auc")
+		formatString: 0.000
+		displayFolder: Model health
+		lineageTag: fedc5894-8f6e-53ce-af03-b48e22ffaa82
+
+	measure 'Credit Gini' = CALCULATE([Metric Value], 'Model Metrics'[Model Name] = "credit_risk", 'Model Metrics'[Metric] = "gini")
+		formatString: 0.000
+		displayFolder: Model health
+		lineageTag: fa02d865-a079-535e-81f0-c01433b129c4
+
+	measure 'Remittance MAPE' = CALCULATE([Metric Value], 'Model Metrics'[Model Name] = "remittance_forecast", 'Model Metrics'[Metric] = "mape")
+		formatString: 0.00%
+		displayFolder: Model health
+		lineageTag: 57985b50-ff68-504a-9ff9-8f1f22f45eb6
+
+	column 'Model Name'
+		dataType: string
+		lineageTag: e43fe505-781c-52a4-8473-eb9ac4e6ade8
+		summarizeBy: none
+		sourceColumn: Model Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: cda75386-4baa-5a48-be7f-6e65f6fc8497
+		summarizeBy: none
+		sourceColumn: Model Version
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Run Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 110e1872-889e-5fd1-a708-29209856d0f0
+		summarizeBy: none
+		sourceColumn: Run Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dataset
+		dataType: string
+		lineageTag: a63aefe6-f023-5fc9-9db0-248c2f0b4174
+		summarizeBy: none
+		sourceColumn: Dataset
+
+		annotation SummarizationSetBy = Automatic
+
+	column Metric
+		dataType: string
+		lineageTag: 17c8892f-29c3-5ecc-9a8b-e630e188658c
+		summarizeBy: none
+		sourceColumn: Metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: double
+		formatString: 0.000
+		lineageTag: 208fcea7-e6bf-566d-9982-d457e19641d1
+		summarizeBy: sum
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Model Metrics' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "model_metrics"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "model_metrics", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "model_metrics.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"model_name", "model_version", "run_date", "dataset", "metric", "value"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"model_name", type text}, {"model_version", type text}, {"run_date", type date}, {"dataset", type text}, {"metric", type text}, {"value", type number}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"model_name", "Model Name"}, {"model_version", "Model Version"}, {"run_date", "Run Date"}, {"dataset", "Dataset"}, {"metric", "Metric"}, {"value", "Value"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

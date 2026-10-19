@@ -1,0 +1,121 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "baa90daf1bd853332f0e",
+  "position": {
+    "x": 648,
+    "y": 200,
+    "z": 8000,
+    "height": 504,
+    "width": 616,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Model Metrics"
+                    }
+                  },
+                  "Property": "Model Name"
+                }
+              },
+              "queryRef": "Model Metrics.Model Name",
+              "nativeQueryRef": "Model Name",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Model Metrics"
+                    }
+                  },
+                  "Property": "Dataset"
+                }
+              },
+              "queryRef": "Model Metrics.Dataset",
+              "nativeQueryRef": "Dataset",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Model Metrics"
+                    }
+                  },
+                  "Property": "Metric"
+                }
+              },
+              "queryRef": "Model Metrics.Metric",
+              "nativeQueryRef": "Metric",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Model Metrics"
+                    }
+                  },
+                  "Property": "Metric Value"
+                }
+              },
+              "queryRef": "Model Metrics.Metric Value",
+              "nativeQueryRef": "Value",
+              "displayName": "Value"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Model Metrics"
+                    }
+                  },
+                  "Property": "Model Version"
+                }
+              },
+              "queryRef": "Model Metrics.Model Version",
+              "nativeQueryRef": "Model Version",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'All metrics'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

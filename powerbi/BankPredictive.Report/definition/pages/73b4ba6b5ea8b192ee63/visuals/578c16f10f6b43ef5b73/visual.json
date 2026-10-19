@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "578c16f10f6b43ef5b73",
+  "position": {
+    "x": 16,
+    "y": 476,
+    "z": 10000,
+    "height": 228,
+    "width": 1248,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date"
+                    }
+                  },
+                  "Property": "Date"
+                }
+              },
+              "queryRef": "Date.Date",
+              "nativeQueryRef": "Date",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Actual"
+                    }
+                  },
+                  "Property": "Remittance Actual (SAR)"
+                }
+              },
+              "queryRef": "Remittance Actual.Remittance Actual (SAR)",
+              "nativeQueryRef": "Actual",
+              "displayName": "Actual"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Forecast"
+                    }
+                  },
+                  "Property": "Remittance Forecast (SAR)"
+                }
+              },
+              "queryRef": "Remittance Forecast.Remittance Forecast (SAR)",
+              "nativeQueryRef": "Forecast",
+              "displayName": "Forecast"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Daily remittance: actual vs forecast (SAR)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

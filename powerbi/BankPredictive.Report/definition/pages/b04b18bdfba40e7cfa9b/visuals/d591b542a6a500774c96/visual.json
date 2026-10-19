@@ -1,0 +1,169 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "d591b542a6a500774c96",
+  "position": {
+    "x": 16,
+    "y": 446,
+    "z": 13000,
+    "height": 258,
+    "width": 1248,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Customer ID"
+                }
+              },
+              "queryRef": "Churn Score.Customer ID",
+              "nativeQueryRef": "Customer ID",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Segment"
+                }
+              },
+              "queryRef": "Customer.Segment",
+              "nativeQueryRef": "Segment",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Region"
+                }
+              },
+              "queryRef": "Customer.Region",
+              "nativeQueryRef": "Region",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Risk Band"
+                }
+              },
+              "queryRef": "Churn Score.Risk Band",
+              "nativeQueryRef": "Risk Band",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Primary Signal"
+                }
+              },
+              "queryRef": "Churn Score.Primary Signal",
+              "nativeQueryRef": "Primary Signal",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Avg Churn Probability"
+                }
+              },
+              "queryRef": "Churn Score.Avg Churn Probability",
+              "nativeQueryRef": "Churn probability",
+              "displayName": "Churn probability"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Churn Score"
+                    }
+                  },
+                  "Property": "Balance at Risk (SAR)"
+                }
+              },
+              "queryRef": "Churn Score.Balance at Risk (SAR)",
+              "nativeQueryRef": "Balance at risk (SAR)",
+              "displayName": "Balance at risk (SAR)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Churn Score"
+                  }
+                },
+                "Property": "Avg Churn Probability"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Retention worklist — highest churn probability first'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

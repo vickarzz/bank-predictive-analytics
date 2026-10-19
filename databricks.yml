@@ -1,0 +1,30 @@
+# Databricks Asset Bundle: deploys the notebooks + a scheduled serverless job.
+#   databricks auth login --host https://<your-workspace>.cloud.databricks.com
+#   databricks bundle validate
+#   databricks bundle deploy -t dev
+#   databricks bundle run bank_predictive_pipeline -t dev
+bundle:
+  name: bank-predictive-analytics
+
+include:
+  - databricks/resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog (Free Edition default is "workspace")
+    default: workspace
+  schema:
+    description: Schema for bronze/silver/gold tables
+    default: bpa
+  n_customers:
+    description: Number of synthetic customers
+    default: "50000"
+
+targets:
+  dev:
+    mode: development
+    default: true
+  prod:
+    mode: production
+    variables:
+      n_customers: "500000"

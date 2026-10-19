@@ -1,0 +1,128 @@
+/// Calendar (Saudi week: Sun=1). Marked as date table.
+table Date
+	lineageTag: d7c28a8e-e56c-52ff-9e36-ece1719f769a
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isKey
+		lineageTag: 73a69dd3-e141-50eb-9cfc-bb0f5133b4df
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: e53a9907-b944-5c67-bc0a-9f4f358244b9
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: f1a3b1f5-67be-569e-bee9-ce83e837d659
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Num'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: f0f67260-c3fc-568e-97f4-2ba3c2fb0328
+		summarizeBy: none
+		sourceColumn: Month Num
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 73cb9c75-fb03-5838-81da-349113584e2e
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Month Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: eaa51aa9-b6d3-586f-ab43-c499da779bea
+		summarizeBy: none
+		sourceColumn: Year Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month End'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: af854bfb-7dee-541d-b7cb-d54be67157b2
+		summarizeBy: none
+		sourceColumn: Month End
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: 9bb6aa9a-f521-582d-92fa-ad0d09ca6fed
+		summarizeBy: none
+		sourceColumn: Day of Week
+		sortByColumn: 'Day of Week Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week Num'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 05e3c77b-0fb2-5a80-8e25-e43d6a8148ca
+		summarizeBy: none
+		sourceColumn: Day of Week Num
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: 3eb6d0c9-5a93-5f79-8b42-3daba9139d77
+		summarizeBy: none
+		sourceColumn: Is Weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Forecast Period'
+		dataType: boolean
+		lineageTag: dbb175af-fd97-5dc4-afe4-ef9dbbc2c2af
+		summarizeBy: none
+		sourceColumn: Is Forecast Period
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "dim_date"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "dim_date", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "dim_date.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"date", "year", "quarter", "month_num", "month_name", "year_month", "month_end", "day_of_week", "day_of_week_num", "is_weekend", "is_forecast_period"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"date", type date}, {"year", Int64.Type}, {"quarter", type text}, {"month_num", Int64.Type}, {"month_name", type text}, {"year_month", type text}, {"month_end", type date}, {"day_of_week", type text}, {"day_of_week_num", Int64.Type}, {"is_weekend", type logical}, {"is_forecast_period", type logical}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"date", "Date"}, {"year", "Year"}, {"quarter", "Quarter"}, {"month_num", "Month Num"}, {"month_name", "Month"}, {"year_month", "Year Month"}, {"month_end", "Month End"}, {"day_of_week", "Day of Week"}, {"day_of_week_num", "Day of Week Num"}, {"is_weekend", "Is Weekend"}, {"is_forecast_period", "Is Forecast Period"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

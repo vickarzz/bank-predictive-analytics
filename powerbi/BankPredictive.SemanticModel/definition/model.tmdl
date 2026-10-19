@@ -1,0 +1,22 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["SourceType", "CsvFolder", "PgServer", "PgDatabase", "DbxServerHostname", "DbxHttpPath", "DbxCatalog", "DbxSchema", "Customer", "Date", "Corridor", "Customer Monthly", "Churn Score", "Loan Risk", "Remittance Actual", "Remittance Forecast", "Model Metrics", "Feature Importance"]
+
+ref table Customer
+ref table Date
+ref table Corridor
+ref table 'Customer Monthly'
+ref table 'Churn Score'
+ref table 'Loan Risk'
+ref table 'Remittance Actual'
+ref table 'Remittance Forecast'
+ref table 'Model Metrics'
+ref table 'Feature Importance'

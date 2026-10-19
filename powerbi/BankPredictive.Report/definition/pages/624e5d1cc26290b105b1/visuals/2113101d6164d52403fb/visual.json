@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "2113101d6164d52403fb",
+  "position": {
+    "x": 16,
+    "y": 200,
+    "z": 10000,
+    "height": 230,
+    "width": 405,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Risk Grade"
+                }
+              },
+              "queryRef": "Loan Risk.Risk Grade",
+              "nativeQueryRef": "Risk Grade",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "EAD (SAR)"
+                }
+              },
+              "queryRef": "Loan Risk.EAD (SAR)",
+              "nativeQueryRef": "EAD (SAR)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'EAD by risk grade (SAR)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

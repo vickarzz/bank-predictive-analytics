@@ -1,0 +1,85 @@
+table 'Feature Importance'
+	lineageTag: a1eb7d47-78f9-518b-9ead-a4793a47da12
+
+	/// Drop in AUC when the feature is shuffled (out-of-time sample).
+	measure 'Permutation Importance' = SUM('Feature Importance'[Importance])
+		formatString: 0.0000
+		displayFolder: Model health
+		lineageTag: e15c9d4c-1565-504e-8c88-9e4bc01f02c9
+
+	column 'Model Name'
+		dataType: string
+		lineageTag: 48b68082-dc0e-5333-bc2d-999abfa84963
+		summarizeBy: none
+		sourceColumn: Model Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: 2ea2574c-df59-59de-a748-269c17a934a7
+		summarizeBy: none
+		sourceColumn: Model Version
+
+		annotation SummarizationSetBy = Automatic
+
+	column Feature
+		dataType: string
+		lineageTag: 77e486b2-838d-50ec-b6d6-a581bb2b67e9
+		summarizeBy: none
+		sourceColumn: Feature
+
+		annotation SummarizationSetBy = Automatic
+
+	column Importance
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 2d51fc63-d9ee-55bc-a238-7769faaaa663
+		summarizeBy: sum
+		sourceColumn: Importance
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Importance Std'
+		dataType: double
+		formatString: 0.0000
+		lineageTag: faed62e9-59a5-5077-97df-2394a14cce52
+		summarizeBy: none
+		sourceColumn: Importance Std
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rank
+		dataType: int64
+		formatString: 0
+		lineageTag: c1efb9d4-e866-5280-81b1-d5759344987d
+		summarizeBy: none
+		sourceColumn: Rank
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Feature Importance' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "feature_importance"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "feature_importance", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "feature_importance.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"model_name", "model_version", "feature", "importance", "importance_std", "rank"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"model_name", type text}, {"model_version", type text}, {"feature", type text}, {"importance", type number}, {"importance_std", type number}, {"rank", Int64.Type}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"model_name", "Model Name"}, {"model_version", "Model Version"}, {"feature", "Feature"}, {"importance", "Importance"}, {"importance_std", "Importance Std"}, {"rank", "Rank"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,96 @@
+{
+  "name": "Bank Predictive",
+  "dataColors": [
+    "#0F766E",
+    "#2563EB",
+    "#D97706",
+    "#DC2626",
+    "#7C3AED",
+    "#64748B",
+    "#0891B2",
+    "#65A30D"
+  ],
+  "foreground": "#1F2937",
+  "foregroundNeutralSecondary": "#4B5563",
+  "foregroundNeutralTertiary": "#9CA3AF",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F3F4F6",
+  "backgroundNeutral": "#E5E7EB",
+  "tableAccent": "#0F766E",
+  "good": "#0F766E",
+  "neutral": "#D97706",
+  "bad": "#DC2626",
+  "maximum": "#0F766E",
+  "center": "#FDE68A",
+  "minimum": "#FEF2F2",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#1F2937"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 26,
+      "color": "#0F766E"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#4B5563"
+    }
+  },
+  "visualStyles": {
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F3F4F6"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    },
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#E5E7EB"
+              }
+            },
+            "radius": 8
+          }
+        ],
+        "title": [
+          {
+            "show": true,
+            "fontSize": 11,
+            "fontColor": {
+              "solid": {
+                "color": "#1F2937"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

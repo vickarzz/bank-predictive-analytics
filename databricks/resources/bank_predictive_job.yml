@@ -1,0 +1,60 @@
+resources:
+  jobs:
+    bank_predictive_pipeline:
+      name: bank-predictive-pipeline
+      description: Bronze -> churn / credit risk / remittance models -> quality gate -> gold tables for Power BI
+      # Serverless compute: no cluster definition needed (works on Databricks Free Edition)
+      schedule:
+        quartz_cron_expression: "0 0 5 * * ?"      # 05:00 daily, before the Power BI refresh
+        timezone_id: Asia/Riyadh
+        pause_status: PAUSED                      # unpause in the UI when you want it scheduled
+      max_concurrent_runs: 1
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+        - name: n_customers
+          default: ${var.n_customers}
+
+      tasks:
+        - task_key: setup
+          notebook_task:
+            notebook_path: ../notebooks/00_setup.py
+
+        - task_key: bronze
+          depends_on: [{ task_key: setup }]
+          notebook_task:
+            notebook_path: ../notebooks/01_bronze.py
+
+        - task_key: churn_features
+          depends_on: [{ task_key: bronze }]
+          notebook_task:
+            notebook_path: ../notebooks/02_silver_churn_features.py
+
+        - task_key: churn_model
+          depends_on: [{ task_key: churn_features }]
+          notebook_task:
+            notebook_path: ../notebooks/03_churn_train_score.py
+
+        - task_key: credit_risk
+          depends_on: [{ task_key: bronze }]
+          notebook_task:
+            notebook_path: ../notebooks/04_credit_risk.py
+
+        - task_key: remittance_forecast
+          depends_on: [{ task_key: bronze }]
+          notebook_task:
+            notebook_path: ../notebooks/05_remittance_forecast.py
+
+        - task_key: publish_gold
+          depends_on:
+            - task_key: churn_model
+            - task_key: credit_risk
+            - task_key: remittance_forecast
+          notebook_task:
+            notebook_path: ../notebooks/06_publish_gold.py
+
+      tags:
+        project: bank-predictive-analytics
+        layer: ml-to-bi

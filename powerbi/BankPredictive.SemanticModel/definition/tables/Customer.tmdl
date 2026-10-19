@@ -1,0 +1,131 @@
+/// One row per customer (synthetic).
+table Customer
+	lineageTag: 4622ebe0-4061-55f7-800e-11e7ea154120
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		isKey
+		lineageTag: bda1b183-50ac-5b72-9425-a8552dba8855
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 98ed2b13-817e-5ab0-ba12-c40520ca5898
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 5902bb24-911e-58f4-a4d7-4e6d573888a1
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Type'
+		dataType: string
+		lineageTag: e9f082a7-61f4-5422-9bcb-80cebf47e52b
+		summarizeBy: none
+		sourceColumn: Customer Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: 9941919c-eecb-516b-ac0d-94822758a3e5
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Band'
+		dataType: string
+		lineageTag: cf77547b-388f-548c-af17-e93246f92983
+		summarizeBy: none
+		sourceColumn: Age Band
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Has Salary Transfer'
+		dataType: boolean
+		lineageTag: 214209c6-e8a1-54fd-a4e6-ce8126534213
+		summarizeBy: none
+		sourceColumn: Has Salary Transfer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d876fa6-0aed-5adb-9e6e-61f10534c83f
+		summarizeBy: none
+		sourceColumn: Product Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Has Mobile App'
+		dataType: boolean
+		lineageTag: 8df18f84-5245-5eff-8832-ba53a2ddbd9c
+		summarizeBy: none
+		sourceColumn: Has Mobile App
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 70932bce-8032-58c8-8ec6-6b7ff36e44cb
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Closed Month'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b734b3de-7a91-5602-934f-3c2a92328f68
+		summarizeBy: none
+		sourceColumn: Closed Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tenure Months'
+		dataType: int64
+		formatString: 0
+		lineageTag: 13b8066d-7c68-5888-a35e-d1f24ed23aa0
+		summarizeBy: none
+		sourceColumn: Tenure Months
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "dim_customer"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "dim_customer", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "dim_customer.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"customer_id", "segment", "region", "customer_type", "age", "age_band", "has_salary_transfer", "product_count", "has_mobile_app", "status", "closed_month", "tenure_months"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"customer_id", Int64.Type}, {"segment", type text}, {"region", type text}, {"customer_type", type text}, {"age", Int64.Type}, {"age_band", type text}, {"has_salary_transfer", type logical}, {"product_count", Int64.Type}, {"has_mobile_app", type logical}, {"status", type text}, {"closed_month", type date}, {"tenure_months", Int64.Type}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"customer_id", "Customer ID"}, {"segment", "Segment"}, {"region", "Region"}, {"customer_type", "Customer Type"}, {"age", "Age"}, {"age_band", "Age Band"}, {"has_salary_transfer", "Has Salary Transfer"}, {"product_count", "Product Count"}, {"has_mobile_app", "Has Mobile App"}, {"status", "Status"}, {"closed_month", "Closed Month"}, {"tenure_months", "Tenure Months"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

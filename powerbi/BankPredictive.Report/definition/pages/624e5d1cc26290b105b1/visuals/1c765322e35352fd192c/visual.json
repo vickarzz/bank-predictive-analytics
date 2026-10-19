@@ -1,0 +1,97 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "1c765322e35352fd192c",
+  "position": {
+    "x": 858,
+    "y": 200,
+    "z": 12000,
+    "height": 230,
+    "width": 405,
+    "tabOrder": 11000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Employer Sector"
+                }
+              },
+              "queryRef": "Loan Risk.Employer Sector",
+              "nativeQueryRef": "Employer Sector",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Expected Loss (SAR)"
+                }
+              },
+              "queryRef": "Loan Risk.Expected Loss (SAR)",
+              "nativeQueryRef": "Expected Loss (SAR)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Loan Risk"
+                  }
+                },
+                "Property": "Expected Loss (SAR)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Expected loss by employer sector (SAR)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

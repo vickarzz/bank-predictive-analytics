@@ -1,0 +1,182 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "79535e28afffb3f61f57",
+  "position": {
+    "x": 16,
+    "y": 446,
+    "z": 13000,
+    "height": 258,
+    "width": 1248,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Loan ID"
+                }
+              },
+              "queryRef": "Loan Risk.Loan ID",
+              "nativeQueryRef": "Loan ID",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Product"
+                }
+              },
+              "queryRef": "Loan Risk.Product",
+              "nativeQueryRef": "Product",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Risk Grade"
+                }
+              },
+              "queryRef": "Loan Risk.Risk Grade",
+              "nativeQueryRef": "Risk Grade",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "DBR Band"
+                }
+              },
+              "queryRef": "Loan Risk.DBR Band",
+              "nativeQueryRef": "DBR Band",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Employer Sector"
+                }
+              },
+              "queryRef": "Loan Risk.Employer Sector",
+              "nativeQueryRef": "Employer Sector",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Avg PD"
+                }
+              },
+              "queryRef": "Loan Risk.Avg PD",
+              "nativeQueryRef": "PD 12M",
+              "displayName": "PD 12M"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "EAD (SAR)"
+                }
+              },
+              "queryRef": "Loan Risk.EAD (SAR)",
+              "nativeQueryRef": "EAD (SAR)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Loan Risk"
+                    }
+                  },
+                  "Property": "Expected Loss (SAR)"
+                }
+              },
+              "queryRef": "Loan Risk.Expected Loss (SAR)",
+              "nativeQueryRef": "Expected Loss (SAR)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Loan Risk"
+                  }
+                },
+                "Property": "Expected Loss (SAR)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Watchlist — largest expected loss first'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

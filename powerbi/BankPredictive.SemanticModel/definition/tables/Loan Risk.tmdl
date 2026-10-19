@@ -1,0 +1,274 @@
+/// 12-month PD, risk grade and expected loss per live personal-finance contract.
+table 'Loan Risk'
+	lineageTag: a4dd9c19-6fbe-5043-94ba-b9d5f79da6a7
+
+	measure 'Live Loans' = COUNTROWS('Loan Risk')
+		formatString: #,0
+		displayFolder: Credit
+		lineageTag: f61fc9aa-8044-53ef-947b-3207889c4882
+
+	/// Exposure at default = outstanding balance.
+	measure 'EAD (SAR)' = SUM('Loan Risk'[EAD SAR])
+		formatString: #,0
+		displayFolder: Credit
+		lineageTag: 417cd52e-61b5-5711-ae84-c484b3106ebf
+
+	/// PD x LGD x EAD.
+	measure 'Expected Loss (SAR)' = SUM('Loan Risk'[Expected Loss SAR])
+		formatString: #,0
+		displayFolder: Credit
+		lineageTag: 99928130-e27c-5148-b711-a2922308f1ae
+
+	measure 'EL Rate' = DIVIDE([Expected Loss (SAR)], [EAD (SAR)])
+		formatString: 0.00%
+		displayFolder: Credit
+		lineageTag: d7f54fbf-d0ab-5ebe-9482-933e5a7bfb08
+
+	measure 'Avg PD' = AVERAGE('Loan Risk'[PD 12M])
+		formatString: 0.00%
+		displayFolder: Credit
+		lineageTag: 5dbec13d-17e0-5b2f-a247-b49ca70f14c3
+
+	measure 'EAD-Weighted PD' = DIVIDE(SUMX('Loan Risk', 'Loan Risk'[PD 12M] * 'Loan Risk'[EAD SAR]), [EAD (SAR)])
+		formatString: 0.00%
+		displayFolder: Credit
+		lineageTag: 1053d620-7272-5d9c-b8fe-b413468d527b
+
+	measure 'Loans Above 45% DBR' = CALCULATE([Live Loans], 'Loan Risk'[DBR] > 0.45)
+		formatString: #,0
+		displayFolder: Credit
+		lineageTag: b0d192b1-56a7-5be6-b175-8a660c7b7c2f
+
+	/// Uses the inactive Origination Date relationship.
+	measure 'Loans Originated' = CALCULATE(COUNTROWS('Loan Risk'), USERELATIONSHIP('Loan Risk'[Origination Date], 'Date'[Date]))
+		formatString: #,0
+		displayFolder: Credit
+		lineageTag: a3ef1cf1-c8c2-589b-92f4-c961df782675
+
+	column 'Loan ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1cade5cc-a37d-5a79-b9bb-6803cdb47288
+		summarizeBy: none
+		sourceColumn: Loan ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 8ce500d3-5442-551f-89cf-ec527e6702f1
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Score Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 2204f7d8-7988-5cf0-8ccd-36ea2e298d69
+		summarizeBy: none
+		sourceColumn: Score Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 1144e7a2-ef5e-507c-bada-0c3481a2c5a9
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Origination Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b62e1ed4-8607-57f8-80c5-90155357eb77
+		summarizeBy: none
+		sourceColumn: Origination Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Principal SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: e6bed4cf-60d6-5733-909c-bac4f3fa9303
+		summarizeBy: sum
+		sourceColumn: Principal SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Outstanding SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: ac2aee3f-3295-54f6-9aea-93ebac3d4864
+		summarizeBy: sum
+		sourceColumn: Outstanding SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tenor Months'
+		dataType: int64
+		formatString: 0
+		lineageTag: 37ca0c9e-30b7-52c9-b0f2-f2ccd60c9e8d
+		summarizeBy: none
+		sourceColumn: Tenor Months
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Profit Rate'
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 2d3d4f6f-3348-5303-96e9-8cadaa4c0be3
+		summarizeBy: none
+		sourceColumn: Profit Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Monthly Salary SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 3307a617-196f-5506-8fdc-f74a4a8d6bf0
+		summarizeBy: none
+		sourceColumn: Monthly Salary SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column DBR
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 58a2e312-0c8c-512c-8917-00f0aaec95d6
+		summarizeBy: none
+		sourceColumn: DBR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DBR Band'
+		dataType: string
+		lineageTag: dcdb99fd-a826-534e-ae98-e0ab98692b1f
+		summarizeBy: none
+		sourceColumn: DBR Band
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Employer Sector'
+		dataType: string
+		lineageTag: 0693f0fd-a820-54c9-8c8f-4e0433639fed
+		summarizeBy: none
+		sourceColumn: Employer Sector
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bureau Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: f7ba973f-2f84-57f6-8078-b1893ff00980
+		summarizeBy: none
+		sourceColumn: Bureau Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Prior Delinquencies'
+		dataType: int64
+		formatString: 0
+		lineageTag: e689e024-c396-5bb5-b347-4d86b9050875
+		summarizeBy: none
+		sourceColumn: Prior Delinquencies
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PD 12M'
+		dataType: double
+		formatString: 0.00%
+		lineageTag: af3e4db6-b333-50b9-8a1d-429b1c9ac5e8
+		summarizeBy: none
+		sourceColumn: PD 12M
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Risk Grade'
+		dataType: string
+		lineageTag: cdbc44bf-f7f9-505c-8391-509736a1b26c
+		summarizeBy: none
+		sourceColumn: Risk Grade
+
+		annotation SummarizationSetBy = Automatic
+
+	column LGD
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 00a61449-bbda-5827-b97d-9f2cec196cc9
+		summarizeBy: none
+		sourceColumn: LGD
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EAD SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 34ef54e7-1d2d-5e02-9089-3d6691458e34
+		summarizeBy: sum
+		sourceColumn: EAD SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Expected Loss SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: cd64d312-5f08-5043-b510-8b828fed7f15
+		summarizeBy: sum
+		sourceColumn: Expected Loss SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Actual Default 12M'
+		dataType: double
+		formatString: 0
+		lineageTag: a9e50e10-4d15-5d60-9c08-7f3ef6d1a9b8
+		summarizeBy: none
+		sourceColumn: Actual Default 12M
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Type'
+		dataType: string
+		lineageTag: d7963d95-a7bd-537d-93b0-08e47da63538
+		summarizeBy: none
+		sourceColumn: Model Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: 9f62f1cf-4f6a-5cbd-9311-0c6edde03aab
+		summarizeBy: none
+		sourceColumn: Model Version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Loan Risk' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "fact_loan_risk"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "fact_loan_risk", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "fact_loan_risk.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"loan_id", "customer_id", "score_date", "product", "origination_date", "principal_sar", "outstanding_sar", "tenor_months", "profit_rate", "monthly_salary_sar", "dbr", "dbr_band", "employer_sector", "bureau_score", "prior_delinquencies", "pd_12m", "risk_grade", "lgd", "ead_sar", "expected_loss_sar", "actual_default_12m", "model_type", "model_version"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"loan_id", Int64.Type}, {"customer_id", Int64.Type}, {"score_date", type date}, {"product", type text}, {"origination_date", type date}, {"principal_sar", type number}, {"outstanding_sar", type number}, {"tenor_months", Int64.Type}, {"profit_rate", type number}, {"monthly_salary_sar", type number}, {"dbr", type number}, {"dbr_band", type text}, {"employer_sector", type text}, {"bureau_score", Int64.Type}, {"prior_delinquencies", Int64.Type}, {"pd_12m", type number}, {"risk_grade", type text}, {"lgd", type number}, {"ead_sar", type number}, {"expected_loss_sar", type number}, {"actual_default_12m", type number}, {"model_type", type text}, {"model_version", type text}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"loan_id", "Loan ID"}, {"customer_id", "Customer ID"}, {"score_date", "Score Date"}, {"product", "Product"}, {"origination_date", "Origination Date"}, {"principal_sar", "Principal SAR"}, {"outstanding_sar", "Outstanding SAR"}, {"tenor_months", "Tenor Months"}, {"profit_rate", "Profit Rate"}, {"monthly_salary_sar", "Monthly Salary SAR"}, {"dbr", "DBR"}, {"dbr_band", "DBR Band"}, {"employer_sector", "Employer Sector"}, {"bureau_score", "Bureau Score"}, {"prior_delinquencies", "Prior Delinquencies"}, {"pd_12m", "PD 12M"}, {"risk_grade", "Risk Grade"}, {"lgd", "LGD"}, {"ead_sar", "EAD SAR"}, {"expected_loss_sar", "Expected Loss SAR"}, {"actual_default_12m", "Actual Default 12M"}, {"model_type", "Model Type"}, {"model_version", "Model Version"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,98 @@
+/// 90-day forecast per corridor with P10-P90 band.
+table 'Remittance Forecast'
+	lineageTag: b0927395-6fdf-56af-bf84-72edb40bc307
+
+	measure 'Remittance Forecast (SAR)' = SUM('Remittance Forecast'[Forecast Amount SAR])
+		formatString: #,0
+		displayFolder: Remittance
+		lineageTag: 7649291e-09c3-5346-890e-5618f22a2bff
+
+	measure 'Forecast P10 (SAR)' = SUM('Remittance Forecast'[Lower P10 SAR])
+		formatString: #,0
+		displayFolder: Remittance
+		lineageTag: 65aa6dda-354b-5e87-b331-f3038b5e8ced
+
+	measure 'Forecast P90 (SAR)' = SUM('Remittance Forecast'[Upper P90 SAR])
+		formatString: #,0
+		displayFolder: Remittance
+		lineageTag: 95d856c6-488f-5edd-ad4d-b9cf4be76230
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isHidden
+		lineageTag: 6200ec0d-b310-51a7-ad97-e4ba51c4e51a
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Corridor
+		dataType: string
+		isHidden
+		lineageTag: 69ae2ea7-5c51-5d68-a259-57664c3cd92a
+		summarizeBy: none
+		sourceColumn: Corridor
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Forecast Amount SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 3e7c9579-791d-5b22-ab06-6d42f8cf419f
+		summarizeBy: sum
+		sourceColumn: Forecast Amount SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lower P10 SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: c8cfd6b1-42d9-5ef8-9df1-1222ce1e3c4b
+		summarizeBy: sum
+		sourceColumn: Lower P10 SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Upper P90 SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: d52afb26-698a-59b3-a44c-1183a3226835
+		summarizeBy: sum
+		sourceColumn: Upper P90 SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Model Version'
+		dataType: string
+		lineageTag: 134908ac-63cf-5d88-93e6-3c0bf26dee78
+		summarizeBy: none
+		sourceColumn: Model Version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Remittance Forecast' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "fact_remittance_forecast"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "fact_remittance_forecast", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "fact_remittance_forecast.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"date", "corridor", "forecast_amount_sar", "lower_p10_sar", "upper_p90_sar", "model_version"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"date", type date}, {"corridor", type text}, {"forecast_amount_sar", type number}, {"lower_p10_sar", type number}, {"upper_p90_sar", type number}, {"model_version", type text}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"date", "Date"}, {"corridor", "Corridor"}, {"forecast_amount_sar", "Forecast Amount SAR"}, {"lower_p10_sar", "Lower P10 SAR"}, {"upper_p90_sar", "Upper P90 SAR"}, {"model_version", "Model Version"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

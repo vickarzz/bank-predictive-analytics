@@ -1,0 +1,97 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "cda32dbbbaf6bb9466c3",
+  "position": {
+    "x": 16,
+    "y": 200,
+    "z": 7000,
+    "height": 504,
+    "width": 616,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Feature Importance"
+                    }
+                  },
+                  "Property": "Feature"
+                }
+              },
+              "queryRef": "Feature Importance.Feature",
+              "nativeQueryRef": "Feature",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Feature Importance"
+                    }
+                  },
+                  "Property": "Permutation Importance"
+                }
+              },
+              "queryRef": "Feature Importance.Permutation Importance",
+              "nativeQueryRef": "Permutation Importance"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Feature Importance"
+                  }
+                },
+                "Property": "Permutation Importance"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Permutation importance by feature'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

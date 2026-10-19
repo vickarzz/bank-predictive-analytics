@@ -1,0 +1,130 @@
+/// Customer x month activity panel (~1.2M rows at default scale).
+table 'Customer Monthly'
+	lineageTag: a608d7f7-f080-552c-a46f-2ef5c4e8dfd0
+
+	measure 'Active Customers' = CALCULATE(DISTINCTCOUNT('Customer Monthly'[Customer ID]), 'Customer Monthly'[Is Active] = TRUE())
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: 381422c4-d099-5ff1-a7b4-a5d7ce2268f6
+
+	measure 'Transaction Amount (SAR)' = SUM('Customer Monthly'[Txn Amount SAR])
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: fc533138-72d1-5c81-b052-4f4f928c54c1
+
+	measure 'Average Balance (SAR)' = AVERAGE('Customer Monthly'[Avg Balance SAR])
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: d9a61a7a-1859-516e-a4c2-5eb8cbf1887b
+
+	measure 'Digital Logins' = SUM('Customer Monthly'[Digital Logins])
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: 15776ceb-57dd-5206-855b-37ef8a48f961
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: f0994f14-9c3a-5525-b135-87abcf2732b4
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month End'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isHidden
+		lineageTag: 96774860-897d-5e8d-bacf-c74c4f277aff
+		summarizeBy: none
+		sourceColumn: Month End
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Active'
+		dataType: boolean
+		lineageTag: 5b772a84-22bc-594a-ae93-bff9cb254a85
+		summarizeBy: none
+		sourceColumn: Is Active
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Txn Count'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 7af52426-61dc-556e-93bb-837e75fd2ca3
+		summarizeBy: sum
+		sourceColumn: Txn Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Txn Amount SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: 3978f2e4-5f9d-59f1-a782-949cbdd0a2b8
+		summarizeBy: sum
+		sourceColumn: Txn Amount SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Avg Balance SAR'
+		dataType: double
+		formatString: #,0
+		lineageTag: f036be46-e7e6-568e-b517-66c91ce7063c
+		summarizeBy: average
+		sourceColumn: Avg Balance SAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Digital Logins'
+		dataType: int64
+		formatString: #,0
+		lineageTag: a7b09449-4994-5542-8ae7-16cfbb566546
+		summarizeBy: sum
+		sourceColumn: Digital Logins
+
+		annotation SummarizationSetBy = Automatic
+
+	column Complaints
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9bd88043-446f-59d3-a729-85c960cca642
+		summarizeBy: sum
+		sourceColumn: Complaints
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Salary Credited'
+		dataType: boolean
+		lineageTag: 5bb58955-ed27-55c1-98df-ca1c5f83e240
+		summarizeBy: none
+		sourceColumn: Salary Credited
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Customer Monthly' = m
+		mode: import
+		source =
+				let
+				    Source =
+				        if SourceType = "PostgreSQL" then
+				            PostgreSQL.Database(PgServer, PgDatabase){[Schema = "gold", Item = "fact_customer_monthly"]}[Data]
+				        else if SourceType = "Databricks" then
+				            Databricks.Catalogs(DbxServerHostname, DbxHttpPath, [Catalog = null, Database = null, EnableAutomaticProxyDiscovery = null])
+				                {[Name = DbxCatalog, Kind = "Database"]}[Data]
+				                {[Name = DbxSchema, Kind = "Schema"]}[Data]
+				                {[Name = "fact_customer_monthly", Kind = "Table"]}[Data]
+				        else
+				            Table.TransformColumns(
+				                Table.PromoteHeaders(
+				                    Csv.Document(File.Contents(CsvFolder & "fact_customer_monthly.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				                    [PromoteAllScalars = true]),
+				                {}, each if _ = "" then null else _),
+				    Selected = Table.SelectColumns(Source, {"customer_id", "month_end", "is_active", "txn_count", "txn_amount_sar", "avg_balance_sar", "digital_logins", "complaints", "salary_credited"}),
+				    Typed = Table.TransformColumnTypes(Selected, {{"customer_id", Int64.Type}, {"month_end", type date}, {"is_active", type logical}, {"txn_count", Int64.Type}, {"txn_amount_sar", type number}, {"avg_balance_sar", type number}, {"digital_logins", Int64.Type}, {"complaints", Int64.Type}, {"salary_credited", type logical}}, "en-US"),
+				    Renamed = Table.RenameColumns(Typed, {{"customer_id", "Customer ID"}, {"month_end", "Month End"}, {"is_active", "Is Active"}, {"txn_count", "Txn Count"}, {"txn_amount_sar", "Txn Amount SAR"}, {"avg_balance_sar", "Avg Balance SAR"}, {"digital_logins", "Digital Logins"}, {"complaints", "Complaints"}, {"salary_credited", "Salary Credited"}})
+				in
+				    Renamed
+
+	annotation PBI_ResultType = Table

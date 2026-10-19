@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "BankPredictive"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1dbc1a13-28b2-505d-9674-9bddb6abdcc1"
+  }
+}

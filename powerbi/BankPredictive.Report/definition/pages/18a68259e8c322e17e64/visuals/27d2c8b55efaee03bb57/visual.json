@@ -1,0 +1,97 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "27d2c8b55efaee03bb57",
+  "position": {
+    "x": 16,
+    "y": 496,
+    "z": 8000,
+    "height": 208,
+    "width": 616,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Corridor"
+                    }
+                  },
+                  "Property": "Corridor"
+                }
+              },
+              "queryRef": "Corridor.Corridor",
+              "nativeQueryRef": "Corridor",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Remittance Forecast"
+                    }
+                  },
+                  "Property": "Remittance Forecast (SAR)"
+                }
+              },
+              "queryRef": "Remittance Forecast.Remittance Forecast (SAR)",
+              "nativeQueryRef": "Remittance Forecast (SAR)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Remittance Forecast"
+                  }
+                },
+                "Property": "Remittance Forecast (SAR)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Forecast by corridor (SAR)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
