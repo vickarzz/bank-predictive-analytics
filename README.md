@@ -1,5 +1,7 @@
 # Bank Predictive Analytics — from Python models to a Power BI report
 
+**Live demo:** https://bank-predictive-analytics.streamlit.app
+
 End-to-end predictive analytics for a (synthetic) Saudi retail bank. Three models are trained, validated, tracked and scored by a scheduled pipeline, and the results land in a gold layer that a Power BI project (PBIP) reads directly.
 
 | Use case | Question it answers | Model | Validation (latest run) |
