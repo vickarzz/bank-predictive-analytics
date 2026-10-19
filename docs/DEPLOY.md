@@ -1,4 +1,4 @@
-# Deploy: GitHub + Streamlit Community Cloud
+# Deploy: GitHub + live demo
 
 ## 1. Push the repository to GitHub
 
@@ -22,7 +22,19 @@ When Git asks for a password, use a **Personal Access Token** (GitHub → Settin
 
 3. Check on github.com that `streamlit_app/demo_data/*.csv` was uploaded. The app needs these files. `data/` is excluded on purpose.
 
-## 2. Deploy the demo on Streamlit Community Cloud
+## 2. Turn on the live demo (GitHub Pages) — recommended
+
+The demo is a single static page, `docs/index.html`, with its data and charting library bundled, so GitHub Pages can serve it directly.
+
+1. On github.com, open the repository and go to **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+3. Set **Branch** to `main` and the folder to `/docs`, then click **Save**.
+4. Wait 1–2 minutes and refresh the page. The URL appears at the top: `https://<your-username>.github.io/bank-predictive-analytics/`.
+5. Every push to `main` republishes the page automatically.
+
+To refresh the demo after changing the models: `python tools/build_static_demo.py`, then commit and push `docs/index.html`.
+
+## 2b. Optional: Streamlit Community Cloud
 
 1. Go to **share.streamlit.io** and sign in with GitHub. Authorise access to the repo when asked.
 2. Click **Create app → Deploy a public app from GitHub** and fill in:
